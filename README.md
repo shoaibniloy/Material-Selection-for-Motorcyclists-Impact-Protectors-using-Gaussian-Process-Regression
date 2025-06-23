@@ -1,170 +1,182 @@
-Gaussian Process Regression for Force Prediction
-This project uses Gaussian Process Regression (GPR) to predict the force (in Newtons) required based on material properties such as density, elasticity, tensile stress, and thickness. The model is trained and evaluated using provided datasets, and various visualizations are generated to assess model performance and feature importance.
 
-Table of Contents
+## **Material-Selection-for-Motorcyclists-Impact-Protectors-using-Gaussian-Process-Regression**
 
-Project Description
-Installation and Setup
-Data Preparation
-Model Training and Hyperparameter Tuning
-Prediction and Evaluation
-Visualizations
-Results and Analysis
-Usage and Examples
-Contributing and License
+### Overview
 
+This repository demonstrates the use of **Gaussian Process Regression (GPR)** for the **material selection** process in **motorcyclists' impact protectors**. The goal is to predict the force exerted on a material based on various material properties such as **Density**, **Elasticity**, **Tensile Stress**, and **Thickness**. The model uses a set of input features (material properties) to predict the force experienced by the material under impact conditions. This model aids in selecting optimal materials that would provide the best protection for motorcyclists.
 
-Project Description
-This project aims to predict the force required for materials with varying properties using Gaussian Process Regression. The key features used for prediction include:
+The project includes data preprocessing, feature engineering, model training using Gaussian Process Regression, performance evaluation, and visualization. The notebook also showcases how to assess the model’s generalization capabilities through learning curves and evaluation metrics.
 
-Density (log transformation)
-Elasticity (Pa)
-Tensile Stress (Pa)
-Thickness (mm)
+### Key Features
 
-The model is trained on a provided dataset (training_data.csv) and evaluated against a test dataset (test_data.csv) with manually assigned actual forces. Visualizations such as learning curves, residual plots, and SHAP summary plots are generated to provide insights into the model's performance and behavior.
+* **Gaussian Process Regressor**: Utilized for capturing complex relationships between input material properties and force values.
+* **Polynomial Features**: Used to extend the input features and allow the model to learn non-linear relationships.
+* **Model Evaluation**: Evaluation metrics such as **Mean Squared Error (MSE)**, **Root Mean Squared Error (RMSE)**, **R²**, and **Mean Absolute Error (MAE)** are used to assess model accuracy.
+* **Learning Curves**: Visualizations to understand the model’s performance over different training sizes.
 
-Installation and Setup
-To run this project, you need Python installed along with the following libraries:
+---
 
-pandas
-scikit-learn
-numpy
-matplotlib
-seaborn
-shap
+### Repository Structure
 
-Install the required libraries using the following command:
-pip install pandas scikit-learn numpy matplotlib seaborn shap
+```plaintext
+Material-Selection-for-Motorcyclists-Impact-Protectors-using-Gaussian-Process-Regression/
+│
+├── training_data.csv              # The training dataset, including material properties and corresponding force values.
+├── test_data.csv                  # The test dataset, which includes material properties and predicted force values.
+└── Final_code.ipynb               # Jupyter Notebook containing all steps: data preprocessing, modeling, and evaluation.
+```
 
-Ensure that the datasets (training_data.csv and test_data.csv) are placed in the project directory, or update the file paths in the script accordingly.
+---
 
-Data Preparation
-The project uses two datasets:
+### Installation Instructions
 
-Training Data (training_data.csv): Contains features and the target variable (Force in N).
-Test Data (test_data.csv): Contains features and predicted forces, with actual forces manually added for evaluation.
+To run this project on your local machine, follow these steps:
 
-Data Cleaning
+1. **Clone the repository** to your local machine:
 
-Force values in both datasets contain commas (e.g., "25,010.32"), which are removed and converted to float for numerical processing.
+   ```bash
+   git clone https://github.com/shoaibniloy/Material-Selection-for-Motorcyclists-Impact-Protectors-using-Gaussian-Process-Regression.git
+   cd Material-Selection-for-Motorcyclists-Impact-Protectors-using-Gaussian-Process-Regression
+   ```
 
-Feature Selection
-The following features are used for training and prediction:
+2. **Create a Python virtual environment** to manage dependencies:
 
-Density (log transformation)
-Elasticity (Pa)
-Tensile Stress (Pa)
-Thickness (mm)
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
 
-Actual Forces for Test Data
-The actual forces for the test data are manually set as follows (based on thickness values):
-25010.32, 25172.46, 25320.78, 20690.14, 20846.25, 20980.45,
-14100.78, 14224.50, 14350.92, 6625.34, 6749.28, 6820.49,
-3989.12, 4090.77, 4150.23, 3150.45, 3237.30, 3302.78
+3. **Install the required dependencies**:
 
-These values are assigned to the test dataset for evaluation.
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Model Training and Hyperparameter Tuning
-Feature Engineering
+   If the `requirements.txt` file is unavailable, install the dependencies manually:
 
-Polynomial Features: Polynomial features of degree 2 are generated using PolynomialFeatures to capture non-linear relationships.
-Standardization: Features are standardized using StandardScaler to ensure consistent scaling across the dataset.
+   ```bash
+   pip install pandas scikit-learn matplotlib numpy shap seaborn
+   ```
 
-Gaussian Process Regressor
+4. **Launch the Jupyter Notebook** to start working with the code:
 
-Kernel: A composite kernel is used, combining:
-ConstantKernel (constant_value bounds: 1e-3 to 1e1)
-RBF (length_scale bounds: 1e-2 to 1e1)
-WhiteKernel (noise_level bounds: 1e-10 to 1e1)
+   ```bash
+   jupyter notebook
+   ```
 
+---
 
-Hyperparameter Tuning: GridSearchCV is employed to optimize:
-alpha: [1e-2, 1e-3, 1e-4, 1e-5]
-constant_value: [0.1, 1, 10, 100]
-length_scale: [0.1, 1, 10, 100]
+### Data Description
 
+This repository includes two CSV files that are crucial for training and evaluating the model:
 
-The best model is selected based on the negative mean squared error from 10-fold cross-validation.
+* **`training_data.csv`**:
+  This dataset is used to train the Gaussian Process model. It contains material properties and their corresponding force values. The columns include:
 
+  * `Material`: The type of material (e.g., different polymers, composites).
+  * `Yield Strength (Pa)`: The material’s yield strength, measured in Pascals.
+  * `Density (log transformation)`: The log-transformed density value of the material.
+  * `Elasticity (Pa)`: The elasticity or Young's modulus of the material in Pascals.
+  * `Tensile Stress (Pa)`: The tensile stress capacity of the material in Pascals.
+  * `Thickness (mm)`: Thickness of the material in millimeters.
+  * `Force (N)`: The corresponding force exerted on the material in Newtons. This is the target variable for prediction.
 
-Prediction and Evaluation
-The trained GPR model predicts force values for the test dataset. The following performance metrics are calculated:
+* **`test_data.csv`**:
+  The test dataset, which has similar material properties to the training data, is used for evaluation. It contains:
 
-Mean Squared Error (MSE): Measures average squared difference between actual and predicted values.
-Root Mean Squared Error (RMSE): Square root of MSE, in the same units as the target variable.
-R² Score: Indicates the proportion of variance explained by the model.
-Mean Absolute Error (MAE): Average absolute difference between actual and predicted values.
-Mean Absolute Percentage Error (MAPE): Average percentage error relative to actual values.
-Maximum Error: Largest absolute difference between actual and predicted values.
+  * `Material`: The type of material.
+  * `Yield Strength (Pa)`: The yield strength in Pascals.
+  * `Density (log transformation)`: The log-transformed density.
+  * `Elasticity (Pa)`: Elasticity in Pascals.
+  * `Tensile Stress (Pa)`: Tensile stress.
+  * `Thickness (mm)`: Thickness in millimeters.
+  * `Predicted Force (N)`: Predicted force values, which are compared against actual forces.
+  * `Actual Force`: The true force values exerted on the material, used to evaluate the model's performance.
 
-These metrics are printed to the console for analysis.
+---
 
-Visualizations
-The script generates several plots to assess model performance and interpretability:
-1. Predicted vs Actual Forces
+### Workflow
 
-A scatter plot comparing predicted forces to actual forces, with a dashed line for perfect prediction.
+The process is broken down into several stages in the **`Final_code.ipynb`** notebook, which includes the following steps:
 
-2. Residual Plot
+#### 1. **Data Preprocessing**
 
-A scatter plot of residuals (actual - predicted) to identify patterns or biases in predictions.
+* **Loading Data**: The training and test datasets are loaded using `pandas.read_csv()`.
+* **Cleaning Data**: The `Force (N)` columns contain commas (e.g., `23,450`), which are removed to ensure correct parsing of numeric values. The columns are then converted to `float` data type.
+* **Manual Force Assignment**: For the test dataset, actual force values are manually assigned based on the thickness of the material.
 
-3. Learning Curve
+#### 2. **Feature Engineering**
 
-Plots training and validation errors (scaled by 1e8) against training set size, with shaded areas representing standard deviation.
+* **Polynomial Features**: Polynomial features of degree 2 are generated using `PolynomialFeatures()` to capture higher-order interactions between the material properties.
+* **Feature Standardization**: Features are standardized using `StandardScaler()` to improve the convergence of the model.
 
-4. Confidence Intervals Plot
+#### 3. **Model Training**
 
-Displays predicted forces with 95% confidence intervals, plotted against thickness values.
+* **Gaussian Process Regression (GPR)**: The core of the model, using a combination of **Radial Basis Function (RBF)** and **White Kernel** for noise modeling. The GPR model is fitted to the training data.
+* **Hyperparameter Tuning**: A `GridSearchCV` is employed for hyperparameter optimization, though this step can be modified or extended as needed.
 
-5. SHAP Summary Plot
+#### 4. **Model Evaluation**
 
-Uses SHAP values to show the impact of each feature on predictions, based on a subset of the data.
+* After training the model, predictions are made on the test data.
+* The model's performance is evaluated using:
 
-6. Feature Correlation Heatmap
+  * **Mean Squared Error (MSE)**
+  * **Root Mean Squared Error (RMSE)**
+  * **R² (coefficient of determination)**
+  * **Mean Absolute Error (MAE)**
+* These metrics help assess how well the model generalizes to unseen data.
 
-A heatmap of correlations between features and the target variable, styled with annotations and a coolwarm colormap.
+#### 5. **Visualization**
 
-7. Actual vs Predicted Forces by Thickness
+* **Predicted vs Actual Force**: A scatter plot is created to compare the predicted force vs. the actual force values.
+* **Learning Curves**: The learning curves plot the model’s error on both the training and validation sets as the training set size increases. This helps identify underfitting or overfitting.
 
-A scatter plot comparing actual and predicted forces against thickness, styled with Calibri font.
+These visualizations are essential for interpreting the model's behavior and performance.
 
-All plots are displayed using matplotlib and seaborn, with customized fonts, sizes, and labels for clarity.
+---
 
-Results and Analysis
-The model's performance is summarized through the calculated metrics (e.g., MSE, RMSE, R², etc.). Key insights from visualizations include:
+### Example Usage
 
-Predicted vs Actual Forces: Assesses how closely predictions align with actual values.
-Residual Plot: Highlights any systematic errors or outliers.
-Learning Curve: Indicates whether the model benefits from more data or suffers from overfitting/underfitting.
-Confidence Intervals: Shows prediction uncertainty, a strength of GPR.
-SHAP Summary: Identifies the most influential features.
-Correlation Heatmap: Reveals relationships between features and the target.
+1. Clone the repository and install dependencies as described above.
+2. Open the Jupyter notebook (`Final_code.ipynb`).
+3. Execute the cells in the notebook to:
 
+   * Load and clean the data.
+   * Preprocess the features.
+   * Train the Gaussian Process Regression model.
+   * Evaluate model performance and visualize results.
+4. Analyze the results:
 
-Usage and Examples
-To run the project:
+   * Check the scatter plot for predicted vs. actual force.
+   * Review the learning curve to evaluate model stability and generalization.
 
-Install the required libraries (see Installation and Setup).
-Place training_data.csv and test_data.csv in the project directory.
-Execute the script:python force_prediction.py
+---
 
+### Requirements
 
+* Python 3.x
+* Jupyter Notebook
+* Libraries:
 
-Example Output
+  * **pandas**: For data manipulation and preprocessing.
+  * **scikit-learn**: For machine learning model training, evaluation, and metrics.
+  * **matplotlib**: For creating visualizations such as learning curves and predicted vs. actual force.
+  * **numpy**: For numerical operations.
+  * **shap**: For model explainability (optional, depending on the notebook version).
+  * **seaborn**: For additional visualizations (optional).
 
-Performance Metrics:MSE: 1234567.89, RMSE: 1111.11, R2: 0.95, MAE: 987.65, MAPE: 5.00%, Max Error: 2000.00
+---
 
+### License
 
-Visualizations: Plots are displayed in sequence, showing model performance and feature insights.
+This repository is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for more information.
 
+---
 
-Contributing and License
-Contributions are welcome! To contribute:
+### Acknowledgments
 
-Fork the repository.
-Create a new branch for your changes.
-Submit a pull request with a detailed description.
+* **Gaussian Process Regressor**: A powerful non-linear regression method used to model complex relationships in the data.
+* **Scikit-learn**: A comprehensive machine learning library used for regression, model evaluation, and hyperparameter tuning.
+* **Matplotlib & Seaborn**: Used for creating insightful visualizations to understand model performance.
+* **Jupyter Notebook**: Provides an interactive environment to document and run the code step by step.
 
-This project is licensed under the MIT License. See the LICENSE file for details.
